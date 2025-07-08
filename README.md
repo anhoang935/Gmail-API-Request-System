@@ -1,6 +1,6 @@
-- Các libs cần install:
-npm install
-npm install dotenv express googleapis node-cron nodemailer
-- Cách run:
-Nhập "node index.js" trong terminal
-Vào địa chỉ http://localhost:3000/
+Required libraries:
+- npm install
+- npm install dotenv express googleapis node-cron nodemailer
+How to run:
+- Type "node index.js" into terminal
+- Go to http://localhost:3000/

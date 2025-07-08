@@ -1,32 +1,36 @@
+// Import các lib cần thiết
 require('dotenv').config();
 const { google } = require('googleapis');
 const express = require('express');
-
 const app = express();
-
 const mammoth = require('mammoth');
 const pdfParse = require('pdf-parse');
 const path = require('path');
 const fs = require('fs');
 const cron = require('node-cron'); 
 
+// Var để lưu data
 const EMAIL_DB = path.join(__dirname, 'emails.json');
 const TOKEN_DB = path.join(__dirname, 'tokens.json');
 
+// OAuth2 của google
 const OAuth2Client = new google.auth.OAuth2(
     process.env.GOOGLE_CLIENT_ID,
     process.env.GOOGLE_CLIENT_SECRET,
     process.env.REDIRECT_URI
 );
 
+// Scope cho các API cần sử dụng
 const scopes = ['https://www.googleapis.com/auth/gmail.readonly'];
 
+// Các var ngày tháng để chỉnh khoảng thời gian lấy email
 const today = new Date();
 const yyyy = today.getFullYear();
 const mm = String(today.getMonth() + 1).padStart(2, '0');
 const dd = String(today.getDate()).padStart(2, '0');
 const timeRange = `after:${yyyy}/${mm}/${dd}`;
 
+// Phần backend hiện page chính 
 app.get('/', async (req, res) => {
     await fetchEmails();
 
@@ -70,6 +74,7 @@ app.get('/', async (req, res) => {
 
 });
 
+// Page để người dùng authenticate cho app
 app.get('/oauth2callback', async (req,res) => {
     const {code} = req.query;
     const {tokens} = await OAuth2Client.getToken(code);
@@ -91,6 +96,7 @@ app.get('/oauth2callback', async (req,res) => {
     res.send(`Registered user: ${email} | <a href="/">Back to Home</a>`);
 });
 
+// Dùng để store email
 async function fetchEmails(){
 
     const users = loadTokens();
@@ -135,21 +141,21 @@ async function fetchEmails(){
         }
         saveEmails(savedEmails);
     }
-    // const mails = await Promise.all(savedEmails.map(async(message)=>`<li>${await getEmail(message, gmail)}`));
-    // res.send(`<h2>Messages</h2><ul>${mails.join('')}</ul>`);
-    // return;
 }
 
+// Route dùng để tạo nút bấm tương tác giúp cho việc fetch email manually
 app.get('/fetch', async (req, res) => {
     await fetchEmails();
     res.redirect('/');
 })
 
+// Tự động fetch emails mỗi tiếng
 cron.schedule('0 * * * *', () => {
     console.log('Auto-fetching emails');
     fetchEmails();
 })
 
+// Đọc email và trả về dạng Html để display lên page chính 
 async function readEmail(email, tokens){
     OAuth2Client.setCredentials(tokens);
     const gmail = google.gmail({version: 'v1', auth: OAuth2Client});
@@ -197,6 +203,7 @@ async function readEmail(email, tokens){
     </li>`;
 }
 
+// Tải file về thiết bị của người dùng
 app.get('/download', async (req,res) => {
     const {messageId, attachmentId, filename} = req.query;
     if(!messageId || !attachmentId || !filename){
@@ -224,6 +231,7 @@ app.get('/download', async (req,res) => {
     }
 });
 
+// Tải nội dung của attrachment nhưng chưa lưu vào database hay ổ đĩa
 async function downloadAttachment(messageId, gmail, attachmentId){
     const response = await gmail.users.messages.attachments.get({
         userId: 'me',
@@ -235,16 +243,19 @@ async function downloadAttachment(messageId, gmail, attachmentId){
     return Buffer.from(data, 'base64');
 }
 
+// Xử lý nội dung của file Docx
 async function parseDocx(buffer){
     const data = await mammoth.extractRawText({buffer});
     return data.value;
 }
 
+// Xử lý nội dung của file PDF
 async function parsePdf(buffer){
     const data = await pdfParse(buffer);
     return data.text;
 }
 
+// Tải emails lưu trong Json
 function loadEmails(){
     try {
         return JSON.parse(fs.readFileSync(EMAIL_DB, 'utf-8'));
@@ -253,10 +264,12 @@ function loadEmails(){
     }
 }
 
+// Lưu emails vào Json
 function saveEmails(emails){
     fs.writeFileSync(EMAIL_DB, JSON.stringify(emails, null, 2));
 }
 
+// Tải tokens lưu từ trong Json
 function loadTokens(){
     try {
         return JSON.parse(fs.readFileSync(TOKEN_DB, 'utf-8'))
@@ -265,6 +278,7 @@ function loadTokens(){
     }
 }
 
+// Lưu tokens vào Json
 function saveTokens(allTokens){
     fs.writeFileSync(TOKEN_DB,JSON.stringify(allTokens, null, 2));
 }
