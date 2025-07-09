@@ -10,8 +10,8 @@ const fs = require('fs');
 const cron = require('node-cron'); 
 
 // Var để lưu data
-const EMAIL_DB = path.join(__dirname, 'emails.json');
-const TOKEN_DB = path.join(__dirname, 'tokens.json');
+const EMAIL_DB = path.join(__dirname, '/data/emails.json');
+const TOKEN_DB = path.join(__dirname, '/data/tokens.json');
 
 // OAuth2 của google
 const OAuth2Client = new google.auth.OAuth2(
