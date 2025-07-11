@@ -1,4 +1,4 @@
-const Email = require('../models/Email');
+import Email from '../models/Email';
 
 async function getAllEmails(){
     return await Email.find();
@@ -20,4 +20,4 @@ async function findEmailByAttachmentID(id){
     return email;
 }
 
-module.exports = {getAllEmails, addEmail, findEmail, findEmailByAttachmentID};
+export {getAllEmails, addEmail, findEmail, findEmailByAttachmentID};

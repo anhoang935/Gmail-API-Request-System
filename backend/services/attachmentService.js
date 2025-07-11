@@ -1,5 +1,5 @@
-const mammoth = require('mammoth');
-const pdfParse = require('pdf-parse');
+import mammoth from 'mammoth';
+import pdfParse from 'pdf-parse';
 
 async function parseDocx(buffer){
     const data = await mammoth.extractRawText({buffer});
@@ -11,4 +11,4 @@ async function parsePdf(buffer){
     return data.text;
 }
 
-module.exports = {parseDocx, parsePdf};
+export {parseDocx, parsePdf};
