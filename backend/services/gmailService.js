@@ -1,6 +1,6 @@
-const {google} = require('googleapis');
-const {getAllUsers, updateUser} = require('./userService');
-const {findEmail, addEmail} = require('./emailService');
+import { google } from 'googleapis';
+import { getAllUsers, updateUser } from './userService';
+import { findEmail, addEmail } from './emailService';
 
 const OAuth2Client = new google.auth.OAuth2(
     process.env.GOOGLE_CLIENT_ID,
@@ -138,4 +138,4 @@ function extractEmail(address){
     return address.trim();
 }
 
-module.exports = {fetchEmails, generateAuthUrl, exchangeCodeForToken};
+export {fetchEmails, generateAuthUrl, exchangeCodeForToken};

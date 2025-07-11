@@ -1,11 +1,23 @@
-const express = require('express');
+import express from 'express';
+import { homePage, fetchRoute, oauth2callback, downloadAttachment } from '../controllers/serviceController.js';
+import { findAllUsers, removeUser } from '../controllers/userController.js';
+import { findAllEmail } from '../controllers/emailController.js';
+
 const router = express.Router();
-const {homePage, fetchRoute, oauth2callback, downloadAttachment, removeUser} = require('../controllers/serviceController');
 
+//Backend display
 router.get('/', homePage);
-router.get('/fetch', fetchRoute);
-router.get('/oauth2callback', oauth2callback);
-router.get('/download', downloadAttachment);
-router.get('/removeUser', removeUser);
 
-module.exports = router;
+//Gmail
+router.post('/fetch', fetchRoute);
+router.post('/oauth2callback', oauth2callback);
+
+//Email
+router.get('/download', downloadAttachment);
+router.get('/emails', findAllEmail)
+
+//User
+router.delete('/user', removeUser);
+router.get('/users', findAllUsers);
+
+export default router;

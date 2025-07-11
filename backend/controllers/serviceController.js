@@ -1,7 +1,7 @@
-const {generateHome} = require('../services/homeService');
-const {fetchEmails, exchangeCodeForToken} = require('../services/gmailService');
-const {findUser, updateUser, addUser, deleteUser} = require('../services/userService');
-const {findEmailByAttachmentID} = require('../services/emailService');
+import { generateHome } from '../services/homeService.js';
+import { fetchEmails, exchangeCodeForToken } from '../services/gmailService.js';
+import { findUser, updateUser, addUser, deleteUser } from '../services/userService.js';
+import { findEmailByAttachmentID } from '../services/emailService.js';
 
 async function homePage(req, res){
     try{
@@ -77,4 +77,4 @@ async function removeUser(req, res){
 }
 
 
-module.exports = {homePage, fetchRoute, oauth2callback, downloadAttachment, removeUser};
+export { homePage, fetchRoute, oauth2callback, downloadAttachment, removeUser };

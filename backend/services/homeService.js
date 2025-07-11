@@ -1,7 +1,7 @@
-const {getAllUsers} = require('./userService');
-const {getAllEmails} = require('./emailService');
-const {fetchEmails, generateAuthUrl} = require('./gmailService');
-const {parseDocx, parsePdf} = require('./attachmentService');
+import { getAllUsers } from './userService';
+import { getAllEmails } from './emailService';
+import { fetchEmails, generateAuthUrl } from './gmailService';
+import { parseDocx, parsePdf } from './attachmentService';
 
 async function generateHome(){
     await fetchEmails();
@@ -77,4 +77,4 @@ async function readEmail(){
     return emailHtmlList;
 }
 
-module.exports = {generateHome, readEmail};
+export {generateHome, readEmail};

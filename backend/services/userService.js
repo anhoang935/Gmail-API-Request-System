@@ -1,4 +1,4 @@
-const User = require('../models/User');
+import User from '../models/User';
 
 async function getAllUsers(){
     return await User.find();
@@ -25,4 +25,4 @@ async function deleteUser(email){
     return await User.findOneAndDelete({email});
 }
 
-module.exports = {getAllUsers, addUser, updateUser, deleteUser, findUser};
+export {getAllUsers, addUser, updateUser, deleteUser, findUser};
