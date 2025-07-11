@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const {homePage, fetchRoute, oauth2callback, downloadAttachment, removeUser} = require('../services/gmailService');
+const {homePage, fetchRoute, oauth2callback, downloadAttachment, removeUser} = require('../controllers/serviceController');
 
 router.get('/', homePage);
 router.get('/fetch', fetchRoute);

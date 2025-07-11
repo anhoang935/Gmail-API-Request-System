@@ -2,8 +2,11 @@ require('dotenv').config();
 const express = require('express');
 const cron = require('node-cron');
 const routes = require('./routes');
+const {connectDB} = require('./config/db');
 
 const app = express();
+
+connectDB();
 
 app.use('/', routes);
 
