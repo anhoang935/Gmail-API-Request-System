@@ -1,4 +1,4 @@
-import Email from '../models/Email';
+import Email from '../models/Email.js';
 
 async function getAllEmails(){
     return await Email.find();
@@ -20,4 +20,19 @@ async function findEmailByAttachmentID(id){
     return email;
 }
 
-export {getAllEmails, addEmail, findEmail, findEmailByAttachmentID};
+async function findEmailByTimeRange(start, end){
+    const email = await Email.find({
+        internalDate: {
+            $gte: String(start),
+            $lte: String(end)
+        }
+    });
+    return email;
+}
+
+async function deleteEmail(id){
+    const email = await Email.findOneAndDelete({id: id});
+    return email;
+}
+
+export {getAllEmails, addEmail, findEmail, findEmailByAttachmentID, findEmailByTimeRange, deleteEmail};

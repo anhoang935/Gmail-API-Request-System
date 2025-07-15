@@ -1,6 +1,8 @@
 import { google } from 'googleapis';
-import { getAllUsers, updateUser } from './userService';
-import { findEmail, addEmail } from './emailService';
+import { getAllUsers, updateUser } from './userService.js';
+import { findEmail, addEmail } from './emailService.js';
+import dotenv from 'dotenv';
+dotenv.config();
 
 const OAuth2Client = new google.auth.OAuth2(
     process.env.GOOGLE_CLIENT_ID,
@@ -12,6 +14,7 @@ const gmail = google.gmail({version: 'v1', auth: OAuth2Client});
 const scopes = ['https://www.googleapis.com/auth/gmail.readonly'];
 
 async function exchangeCodeForToken(code){
+    console.log('GOOGLE_CLIENT_ID:', process.env.GOOGLE_CLIENT_ID);
     const {tokens} = await OAuth2Client.getToken(code);
     OAuth2Client.setCredentials(tokens);
 
@@ -21,7 +24,7 @@ async function exchangeCodeForToken(code){
     return {email, tokens};
 }
 
-async function generateAuthUrl(){
+function generateAuthUrl(){
     return OAuth2Client.generateAuthUrl({
         access_type: 'offline',
         scope: scopes,
@@ -29,22 +32,44 @@ async function generateAuthUrl(){
     });
 }
 
-async function fetchEmails(){
+async function fetchEmails(start, end){
 
     const users = await getAllUsers();
 
-    // const today = new Date();
-    // const yyyy = today.getFullYear();
-    // const mm = String(today.getMonth()+1).padStart(2,'0');
-    // const dd = String(today.getDate()).padStart(2,'0');
+    const today = new Date();
+    const yyyy = today.getFullYear();
+    const mm = String(today.getMonth()+1).padStart(2,'0');
+    const dd = String(today.getDate()).padStart(2,'0');
 
-    const pastDay = new Date();
-    pastDay.setDate(pastDay.getDate() - 2);
-    const yyyy = pastDay.getFullYear();
-    const mm = String(pastDay.getMonth() + 1).padStart(2, '0');
-    const dd = String(pastDay.getDate()).padStart(2, '0');
+    // const pastDay = new Date();
+    // pastDay.setDate(pastDay.getDate() - 2);
+    // const yyyy = pastDay.getFullYear();
+    // const mm = String(pastDay.getMonth() + 1).padStart(2, '0');
+    // const dd = String(pastDay.getDate()).padStart(2, '0');
 
-    const timeRange = `after:${yyyy}/${mm}/${dd}`;
+    let timeRange = '';
+
+    if(!start && !end){
+        timeRange = `after:${yyyy}/${mm}/${dd}`;
+    }
+
+    if(start){
+        const startDate = new Date(start);
+        const startY = startDate.getFullYear();
+        const startM = String(startDate.getMonth() + 1).padStart(2, '0');
+        const startD = String(startDate.getDate()).padStart(2, '0');
+        timeRange += `after:${startY}/${startM}/${startD}`;
+    }
+
+    if(end){
+        const endDate = new Date(end);
+        const endY = endDate.getFullYear();
+        const endM = String(endDate.getMonth() + 1).padStart(2, '0');
+        const endD = String(endDate.getDate()).padStart(2, '0');
+        timeRange += `before:${endY}/${endM}/${endD}`;
+    }
+
+    timeRange = timeRange.trim();
 
     for(const user of users){
         OAuth2Client.setCredentials(user.tokens);
@@ -78,7 +103,7 @@ async function fetchEmails(){
                 userId: 'me',
                 id: message.id
             });
-            console.log(messageInfo);
+            // console.log(messageInfo);
             if (!messageInfo.data.payload || !messageInfo.data) {
                 console.log(`Skipping message with no payload: ${message.id}`);
                 continue;
@@ -86,11 +111,11 @@ async function fetchEmails(){
 
             let attachments = [];
             const parts = messageInfo.data.payload.parts || [];
-            console.log('Part: ',parts);
+            // console.log('Part: ',parts);
             for(const part of parts){
                 if(part.filename && part.filename.length>0){
                     let attachmentId = part.body.attachmentId;
-                    const attachmentData = await readAttachment(messageInfo.data.id, attachmentId);
+                    const attachmentData = await readAttachmentService(messageInfo.data.id, attachmentId);
                     attachments.push({
                         attachmentId: attachmentId,
                         filename: part.filename,
@@ -119,7 +144,7 @@ async function fetchEmails(){
     return 'Email fetched successfully';
 }
 
-async function readAttachment(messageId, attachmentId){
+async function readAttachmentService(messageId, attachmentId){
     const response = await gmail.users.messages.attachments.get({
         userId: 'me',
         messageId: messageId,

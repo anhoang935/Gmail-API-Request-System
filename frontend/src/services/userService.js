@@ -4,7 +4,7 @@ const BASE_URL = process.env.REACT_APP_BACKEND_URL;
 
 const userService = {
     addUser: () => {
-        window.location.href = `${BASE_URL}/oauth2callback`;
+        window.location.href = `${BASE_URL}/auth`;
     },
     removeUser: async (email) => {
         try{

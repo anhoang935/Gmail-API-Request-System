@@ -1,7 +1,7 @@
-import { getAllUsers } from './userService';
-import { getAllEmails } from './emailService';
-import { fetchEmails, generateAuthUrl } from './gmailService';
-import { parseDocx, parsePdf } from './attachmentService';
+import { getAllUsers } from './userService.js';
+import { getAllEmails } from './emailService.js';
+import { fetchEmails, generateAuthUrl } from './gmailService.js';
+import { parseDocx, parsePdf } from './attachmentService.js';
 
 async function generateHome(){
     await fetchEmails();

@@ -4,7 +4,7 @@ import { exchangeCodeForToken } from '../services/gmailService.js';
 async function findAllUsers(req, res){
     try {
         const users = await getAllUsers();
-        return users;
+        res.json(users);
     } catch (err){
         console.error(err);
         res.status(500).send('Error getting all users');
@@ -15,6 +15,7 @@ async function removeUser(req, res){
     try{
         const {email} = req.query;
         await deleteUser(email); 
+        res.send('OK');
     } catch(err) {
         console.error(err);
         res.status(500).send('Error removing user');
@@ -33,6 +34,8 @@ async function registerUser(req, res){
             await addUser(userData);
         }
         
+        res.send('OK');
+
     } catch (err){
         console.log(err);
         res.status(500).send('Error completing OAuth2 callback');

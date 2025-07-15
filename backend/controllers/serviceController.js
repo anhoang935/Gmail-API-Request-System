@@ -1,5 +1,5 @@
 import { generateHome } from '../services/homeService.js';
-import { fetchEmails, exchangeCodeForToken } from '../services/gmailService.js';
+import { fetchEmails, exchangeCodeForToken, generateAuthUrl } from '../services/gmailService.js';
 import { findUser, updateUser, addUser, deleteUser } from '../services/userService.js';
 import { findEmailByAttachmentID } from '../services/emailService.js';
 
@@ -15,8 +15,12 @@ async function homePage(req, res){
 
 async function fetchRoute(req, res){
     try{
-        await fetchEmails();
-        res.redirect('/');
+        const {start, end} = req.body;
+        if(!start || !end){
+            return res.status(400).send('Missing parameter');
+        }
+        await fetchEmails(start, end);
+        res.redirect('http://localhost:3000/');
     } catch(err) {
         console.error(err);
         res.status(500).send('Error fetching emails');
@@ -25,6 +29,8 @@ async function fetchRoute(req, res){
 
 async function oauth2callback(req, res){
     try{
+        console.log('Query:', req.query);
+
         const {code} = req.query;
         const userData = await exchangeCodeForToken(code);
 
@@ -35,11 +41,16 @@ async function oauth2callback(req, res){
             await addUser(userData);
         }
 
-        res.send(`Registered user: ${userData.email} | <a href="/">Back to Home</a>`);
+        res.redirect(`http://localhost:3000/`);
     } catch (err){
         console.log(err);
         res.status(500).send('Error completing OAuth2 callback');
     }
+}
+
+async function authRoute(req, res){
+    const authUrl = generateAuthUrl();
+    res.redirect(authUrl);
 }
 
 async function downloadAttachment(req, res){
@@ -54,7 +65,7 @@ async function downloadAttachment(req, res){
         const data = attachment.content;
 
         res.set({
-            'Content-Type': 'application/cotet-stream',
+            'Content-Type': 'application/octet-stream',
             'Content-Disposition': `attachment; filename="${filename}"`
         });
 
@@ -77,4 +88,4 @@ async function removeUser(req, res){
 }
 
 
-export { homePage, fetchRoute, oauth2callback, downloadAttachment, removeUser };
+export { homePage, fetchRoute, oauth2callback, downloadAttachment, removeUser, authRoute };

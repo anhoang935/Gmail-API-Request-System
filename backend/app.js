@@ -4,6 +4,8 @@ import cron from 'node-cron';
 import routes from './routes/index.js';
 import { connectDB } from './config/db.js';
 import { fetchEmails } from './services/gmailService.js';
+import cors from 'cors';
+
 
 dotenv.config();
 
@@ -11,6 +13,8 @@ const app = express();
 
 connectDB();
 
+app.use(express.json({ limit: '10mb' }));
+app.use(cors());
 app.use('/', routes);
 
 cron.schedule('0 * * * *', () => {

@@ -1,17 +1,12 @@
-import logo from './logo.svg';
 import './App.css';
+import User from './components/User';
+import Email from './components/Email';
 
 function App() {
   return (
     <div className='container'>
-      <div className='userContainer'>
-        <h2>Registered Users</h2>
-        <button>Register New User</button>
-        <div className='userList'></div> 
-      </div>
-      <div className='emailContainer'>
-        
-      </div>
+      <User></User>
+      <Email></Email>
     </div>
   );
 }
