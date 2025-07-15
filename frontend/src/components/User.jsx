@@ -30,6 +30,7 @@ const User = () => {
     const handleDeleteUser = async (email) => {
         try {
             await userService.removeUser(email);
+            handleFindUsers();
         } catch (error) {
             console.error('Error handleDeleteUser', error);
         }
